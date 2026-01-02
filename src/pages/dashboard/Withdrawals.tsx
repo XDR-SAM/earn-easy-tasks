@@ -59,6 +59,12 @@ const Withdrawals = () => {
     fetchWithdrawals();
   }, [user]);
 
+  // Calculate available balance (current coins minus pending withdrawals)
+  const pendingWithdrawalCoins = withdrawals
+    .filter(w => w.status === 'pending')
+    .reduce((sum, w) => sum + w.coins, 0);
+  const availableCoins = (profile?.coins || 0) - pendingWithdrawalCoins;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -73,10 +79,21 @@ const Withdrawals = () => {
       return;
     }
 
-    if (coinsAmount > (profile?.coins || 0)) {
+    if (coinsAmount > availableCoins) {
       toast({
         title: "Insufficient balance",
-        description: "You don't have enough coins.",
+        description: "You don't have enough available coins (excluding pending withdrawals).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if there's already a pending withdrawal
+    const hasPendingWithdrawal = withdrawals.some(w => w.status === 'pending');
+    if (hasPendingWithdrawal) {
+      toast({
+        title: "Pending withdrawal exists",
+        description: "Please wait for your pending withdrawal to be processed before requesting another.",
         variant: "destructive",
       });
       return;
@@ -106,7 +123,25 @@ const Withdrawals = () => {
           account_number: accountNumber.trim(),
         });
 
-      if (error) throw error;
+      if (error) {
+        // Handle unique constraint violation
+        if (error.code === '23505') {
+          toast({
+            title: "Pending withdrawal exists",
+            description: "You already have a pending withdrawal request.",
+            variant: "destructive",
+          });
+        } else if (error.code === '42501') {
+          toast({
+            title: "Insufficient balance",
+            description: "You don't have enough available coins for this withdrawal.",
+            variant: "destructive",
+          });
+        } else {
+          throw error;
+        }
+        return;
+      }
 
       toast({
         title: "Withdrawal requested!",
@@ -116,6 +151,7 @@ const Withdrawals = () => {
       setCoins("");
       setPaymentSystem("");
       setAccountNumber("");
+      await refreshProfile();
       fetchWithdrawals();
     } catch (error) {
       console.error('Error creating withdrawal:', error);
@@ -164,7 +200,7 @@ const Withdrawals = () => {
                 </p>
               </div>
 
-              {(profile?.coins || 0) < MIN_WITHDRAWAL_COINS ? (
+              {availableCoins < MIN_WITHDRAWAL_COINS ? (
                 <div className="flex items-start gap-3 p-4 rounded-lg bg-warning/10 border border-warning/20">
                   <AlertCircle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
                   <div>
@@ -185,8 +221,13 @@ const Withdrawals = () => {
                       value={coins}
                       onChange={(e) => setCoins(e.target.value)}
                       min={MIN_WITHDRAWAL_COINS}
-                      max={profile?.coins || 0}
+                      max={availableCoins}
                     />
+                    {pendingWithdrawalCoins > 0 && (
+                      <p className="text-sm text-warning">
+                        {pendingWithdrawalCoins} coins reserved in pending withdrawal
+                      </p>
+                    )}
                     <p className="text-sm text-muted-foreground">
                       You'll receive: ${usdValue} USD
                     </p>
