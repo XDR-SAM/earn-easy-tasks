@@ -2,34 +2,42 @@ import { ReactNode } from "react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import DashboardSidebar from "./DashboardSidebar";
 import DashboardHeader from "./DashboardHeader";
+import { useAuth } from "@/hooks/useAuth";
 
 interface DashboardLayoutProps {
   children: ReactNode;
 }
 
-// Mock user data - will be replaced with actual auth
-const mockUser = {
-  name: "John Doe",
-  avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
-  role: "worker" as const,
-  coins: 2450,
-};
-
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
+  const { profile, role, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-pulse text-lg">Loading dashboard...</div>
+      </div>
+    );
+  }
+
+  const userName = profile?.full_name || "User";
+  const userAvatar = profile?.avatar_url || "";
+  const userCoins = profile?.coins || 0;
+  const userRole = role || "worker";
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-muted/30">
         <DashboardSidebar
-          userRole={mockUser.role}
-          userName={mockUser.name}
-          userAvatar={mockUser.avatar}
-          userCoins={mockUser.coins}
+          userRole={userRole}
+          userName={userName}
+          userAvatar={userAvatar}
+          userCoins={userCoins}
         />
         <SidebarInset className="flex-1">
           <DashboardHeader
-            userName={mockUser.name}
-            userAvatar={mockUser.avatar}
-            userCoins={mockUser.coins}
+            userName={userName}
+            userAvatar={userAvatar}
+            userCoins={userCoins}
           />
           <main className="p-6">
             {children}
