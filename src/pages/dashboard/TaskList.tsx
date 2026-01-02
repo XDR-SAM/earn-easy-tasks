@@ -1,83 +1,71 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Coins, Calendar, Users, Search, Eye } from "lucide-react";
+import { Coins, Calendar, Users, Search, Eye, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
-// Mock data for available tasks
-const tasks = [
-  {
-    id: 1,
-    title: "Watch YouTube video and leave a meaningful comment",
-    buyerName: "Marketing Pro",
-    buyerAvatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100",
-    completionDate: "2024-01-15",
-    payableAmount: 15,
-    requiredWorkers: 45,
-    image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400",
-  },
-  {
-    id: 2,
-    title: "Complete a 5-minute survey about shopping preferences",
-    buyerName: "Research Inc",
-    buyerAvatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100",
-    completionDate: "2024-01-18",
-    payableAmount: 25,
-    requiredWorkers: 100,
-    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400",
-  },
-  {
-    id: 3,
-    title: "Share our Instagram post and tag 3 friends",
-    buyerName: "Brand Boost",
-    buyerAvatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100",
-    completionDate: "2024-01-12",
-    payableAmount: 10,
-    requiredWorkers: 200,
-    image: "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=400",
-  },
-  {
-    id: 4,
-    title: "Write a 100-word product review for our new gadget",
-    buyerName: "TechReview",
-    buyerAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",
-    completionDate: "2024-01-20",
-    payableAmount: 50,
-    requiredWorkers: 30,
-    image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400",
-  },
-  {
-    id: 5,
-    title: "Sign up for our newsletter and confirm email",
-    buyerName: "Email Masters",
-    buyerAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100",
-    completionDate: "2024-01-25",
-    payableAmount: 5,
-    requiredWorkers: 500,
-    image: "https://images.unsplash.com/photo-1596526131083-e8c633c948d2?w=400",
-  },
-  {
-    id: 6,
-    title: "Download our mobile app and complete onboarding",
-    buyerName: "App Launch Co",
-    buyerAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
-    completionDate: "2024-01-22",
-    payableAmount: 35,
-    requiredWorkers: 75,
-    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400",
-  },
-];
+interface Task {
+  id: string;
+  title: string;
+  image_url: string | null;
+  payable_amount: number;
+  required_workers: number;
+  completion_date: string;
+  buyer: {
+    full_name: string;
+    avatar_url: string | null;
+  } | null;
+}
 
 const TaskList = () => {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select(`
+          id,
+          title,
+          image_url,
+          payable_amount,
+          required_workers,
+          completion_date,
+          buyer:profiles!tasks_buyer_id_profiles_fkey (
+            full_name,
+            avatar_url
+          )
+        `)
+        .gt('required_workers', 0)
+        .gte('completion_date', new Date().toISOString().split('T')[0])
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        setTasks(data as unknown as Task[]);
+      }
+      setLoading(false);
+    };
+
+    fetchTasks();
+  }, []);
 
   const filteredTasks = tasks.filter((task) =>
     task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    task.buyerName.toLowerCase().includes(searchQuery.toLowerCase())
+    task.buyer?.full_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -101,16 +89,22 @@ const TaskList = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredTasks.map((task) => (
           <Card key={task.id} className="glass-card overflow-hidden hover-lift group">
-            <div className="relative h-40 overflow-hidden">
-              <img
-                src={task.image}
-                alt={task.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
+            <div className="relative h-40 overflow-hidden bg-muted">
+              {task.image_url ? (
+                <img
+                  src={task.image_url}
+                  alt={task.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-4xl">📋</span>
+                </div>
+              )}
               <div className="absolute top-3 right-3">
                 <div className="coin-badge">
                   <Coins className="w-4 h-4" />
-                  {task.payableAmount}
+                  {task.payable_amount}
                 </div>
               </div>
             </div>
@@ -120,20 +114,20 @@ const TaskList = () => {
               
               <div className="flex items-center gap-3">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={task.buyerAvatar} alt={task.buyerName} />
-                  <AvatarFallback>{task.buyerName[0]}</AvatarFallback>
+                  <AvatarImage src={task.buyer?.avatar_url || ''} alt={task.buyer?.full_name} />
+                  <AvatarFallback>{task.buyer?.full_name?.[0] || 'B'}</AvatarFallback>
                 </Avatar>
-                <span className="text-sm text-muted-foreground">{task.buyerName}</span>
+                <span className="text-sm text-muted-foreground">{task.buyer?.full_name || 'Unknown'}</span>
               </div>
 
               <div className="flex items-center justify-between text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
-                  {new Date(task.completionDate).toLocaleDateString()}
+                  {new Date(task.completion_date).toLocaleDateString()}
                 </div>
                 <div className="flex items-center gap-1">
                   <Users className="w-4 h-4" />
-                  {task.requiredWorkers} spots
+                  {task.required_workers} spots
                 </div>
               </div>
 
