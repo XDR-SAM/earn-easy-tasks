@@ -76,7 +76,7 @@ const ManageUsers = () => {
     fetchUsers();
   }, []);
 
-  const handleRoleChange = async (userId: string, newRole: string) => {
+  const handleRoleChange = async (userId: string, newRole: "admin" | "buyer" | "worker") => {
     try {
       const { error } = await supabase
         .from('user_roles')
@@ -248,7 +248,7 @@ const ManageUsers = () => {
                       <div className="flex items-center gap-2">
                         <Select
                           value={user.role}
-                          onValueChange={(value) => handleRoleChange(user.user_id, value)}
+                          onValueChange={(value) => handleRoleChange(user.user_id, value as "admin" | "buyer" | "worker")}
                         >
                           <SelectTrigger className="w-[100px]">
                             <SelectValue />
