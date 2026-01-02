@@ -5,11 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Coins, Mail, Lock, Eye, EyeOff, User, Image, ArrowLeft, Gift, Shield } from "lucide-react";
+import { Coins, Mail, Lock, Eye, EyeOff, User, Image, ArrowLeft, Gift } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 
-type UserRole = 'worker' | 'buyer' | 'admin';
+type UserRole = 'worker' | 'buyer';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -35,7 +35,7 @@ const Register = () => {
     if (!formData.role) {
       toast({
         title: "Please select a role",
-        description: "Choose whether you want to be a Worker, Buyer, or Admin.",
+        description: "Choose whether you want to be a Worker or Buyer.",
         variant: "destructive",
       });
       return;
@@ -70,7 +70,7 @@ const Register = () => {
       return;
     }
 
-    const coins = formData.role === "worker" ? 10 : formData.role === "buyer" ? 50 : 100;
+    const coins = formData.role === "worker" ? 10 : 50;
     toast({
       title: "Welcome to MicroTasks!",
       description: `Account created successfully. You received ${coins} bonus coins!`,
@@ -109,7 +109,7 @@ const Register = () => {
               <Gift className="w-5 h-5 text-success" />
               <div className="text-sm">
                 <p className="font-medium text-success">Signup Bonus!</p>
-                <p className="text-muted-foreground">Workers: 10 coins | Buyers: 50 coins | Admin: 100 coins</p>
+                <p className="text-muted-foreground">Workers: 10 coins | Buyers: 50 coins</p>
               </div>
             </div>
 
@@ -202,12 +202,6 @@ const Register = () => {
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-accent" />
                         Buyer - Post tasks & hire workers
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="admin">
-                      <div className="flex items-center gap-2">
-                        <Shield className="w-3 h-3 text-destructive" />
-                        Admin - Manage platform & users
                       </div>
                     </SelectItem>
                   </SelectContent>
