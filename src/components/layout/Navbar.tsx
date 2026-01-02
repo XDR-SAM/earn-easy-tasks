@@ -10,14 +10,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Coins, Github, LogOut, LayoutDashboard, User, Menu, X } from "lucide-react";
 import { useState } from "react";
-
-// Mock user state - will be replaced with actual auth
-const mockUser = null; // Set to null for logged out state
+import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const user = mockUser;
+  const { user, profile, signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
@@ -47,7 +50,7 @@ const Navbar = () => {
                 {/* Coin Balance */}
                 <div className="coin-badge">
                   <Coins className="w-4 h-4" />
-                  <span>250</span>
+                  <span>{profile?.coins || 0}</span>
                 </div>
 
                 {/* User Menu */}
@@ -55,22 +58,27 @@ const Navbar = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                       <Avatar className="h-10 w-10 border-2 border-primary/20">
-                        <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100" />
-                        <AvatarFallback>JD</AvatarFallback>
+                        <AvatarImage src={profile?.avatar_url || ""} />
+                        <AvatarFallback>
+                          {profile?.full_name?.split(' ').map(n => n[0]).join('') || 'U'}
+                        </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56 glass-card" align="end">
-                    <DropdownMenuItem className="flex items-center gap-2">
-                      <User className="w-4 h-4" />
-                      Profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="flex items-center gap-2">
-                      <LayoutDashboard className="w-4 h-4" />
-                      Dashboard
+                    <div className="p-2">
+                      <p className="font-medium">{profile?.full_name}</p>
+                      <p className="text-xs text-muted-foreground">{profile?.email}</p>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard" className="flex items-center gap-2 cursor-pointer">
+                        <LayoutDashboard className="w-4 h-4" />
+                        Dashboard
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="flex items-center gap-2 text-destructive">
+                    <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 text-destructive cursor-pointer">
                       <LogOut className="w-4 h-4" />
                       Logout
                     </DropdownMenuItem>
@@ -117,24 +125,33 @@ const Navbar = () => {
                 <>
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100" />
-                      <AvatarFallback>JD</AvatarFallback>
+                      <AvatarImage src={profile?.avatar_url || ""} />
+                      <AvatarFallback>
+                        {profile?.full_name?.split(' ').map(n => n[0]).join('') || 'U'}
+                      </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium">John Doe</p>
+                      <p className="font-medium">{profile?.full_name}</p>
                       <div className="coin-badge text-xs py-1 px-2">
                         <Coins className="w-3 h-3" />
-                        250 Coins
+                        {profile?.coins || 0} Coins
                       </div>
                     </div>
                   </div>
-                  <Link to="/dashboard">
+                  <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="ghost" className="w-full justify-start">
                       <LayoutDashboard className="w-4 h-4 mr-2" />
                       Dashboard
                     </Button>
                   </Link>
-                  <Button variant="ghost" className="w-full justify-start text-destructive">
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start text-destructive"
+                    onClick={() => {
+                      handleLogout();
+                      setMobileMenuOpen(false);
+                    }}
+                  >
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout
                   </Button>

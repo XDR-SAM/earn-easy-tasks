@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
   Sidebar,
@@ -24,11 +24,11 @@ import {
   CreditCard,
   History,
   Users,
-  ShieldCheck,
   Bell,
   Coins,
   LogOut,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 type UserRole = "worker" | "buyer" | "admin";
 
@@ -57,6 +57,7 @@ const menuItems = {
     { title: "Home", url: "/dashboard", icon: Home },
     { title: "Manage Users", url: "/dashboard/users", icon: Users },
     { title: "Manage Tasks", url: "/dashboard/manage-tasks", icon: ClipboardList },
+    { title: "Withdrawals", url: "/dashboard/admin-withdrawals", icon: Wallet },
   ],
 };
 
@@ -68,6 +69,13 @@ const roleColors = {
 
 const DashboardSidebar = ({ userRole, userName, userAvatar, userCoins }: DashboardSidebarProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <Sidebar className="border-r border-sidebar-border">
@@ -135,7 +143,6 @@ const DashboardSidebar = ({ userRole, userName, userAvatar, userCoins }: Dashboa
                   <Link to="/dashboard/notifications" className="flex items-center gap-3">
                     <Bell className="w-4 h-4" />
                     <span>Notifications</span>
-                    <Badge className="ml-auto bg-destructive text-destructive-foreground text-xs">3</Badge>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -147,11 +154,9 @@ const DashboardSidebar = ({ userRole, userName, userAvatar, userCoins }: Dashboa
       <SidebarFooter className="p-4 border-t border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link to="/" className="flex items-center gap-3 text-destructive hover:text-destructive">
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </Link>
+            <SidebarMenuButton onClick={handleLogout} className="flex items-center gap-3 text-destructive hover:text-destructive cursor-pointer">
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
