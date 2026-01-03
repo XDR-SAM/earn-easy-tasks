@@ -1,73 +1,210 @@
-# Welcome to your Lovable project
+# 🚀 Micro Gig Nexus - Micro Tasking & Earning Platform
 
-## Project info
+A modern, full-stack micro-tasking platform where workers complete small tasks to earn rewards and buyers post tasks to get work done efficiently.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](https://micro-gig-nexus.lovable.app)
+[![Built with Lovable](https://img.shields.io/badge/Built%20with-Lovable-ff69b4?style=for-the-badge)](https://lovable.dev)
 
-## How can I edit this code?
+## 🌐 Live Demo
 
-There are several ways of editing your application.
+**[https://micro-gig-nexus.lovable.app](https://micro-gig-nexus.lovable.app)**
 
-**Use Lovable**
+## 📋 Overview
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Micro Gig Nexus is a comprehensive platform designed to connect task creators (Buyers) with task completers (Workers). The platform features a robust coin-based economy, real-time notifications, and a powerful admin dashboard for platform management.
 
-Changes made via Lovable will be committed automatically to this repo.
+## ✨ Features
 
-**Use your preferred IDE**
+### 👷 Worker Features
+- **Browse Tasks** - View available tasks with detailed descriptions and rewards
+- **Submit Work** - Complete tasks and submit proof of work
+- **Track Submissions** - Monitor submission status (pending, approved, rejected)
+- **Earn Coins** - Receive coins upon task approval
+- **Withdraw Earnings** - Request withdrawals via multiple payment methods
+- **Notifications** - Stay updated on task approvals and payments
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 💼 Buyer Features
+- **Post Tasks** - Create tasks with descriptions, rewards, and deadlines
+- **Manage Tasks** - View, edit, and delete posted tasks
+- **Review Submissions** - Approve or reject worker submissions
+- **Purchase Coins** - Buy coins to fund task rewards
+- **Payment History** - Track all coin purchases and transactions
+- **Notifications** - Get notified when workers submit tasks
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 🛡️ Admin Features
+- **User Management** - View all users, change roles, manage accounts
+- **Task Oversight** - Monitor all platform tasks
+- **Withdrawal Management** - Approve/reject withdrawal requests
+- **Platform Statistics** - View platform-wide metrics and analytics
 
-Follow these steps:
+## 🛠️ Tech Stack
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+| Category | Technology |
+|----------|------------|
+| **Frontend** | React 18, TypeScript, Vite |
+| **Styling** | Tailwind CSS, shadcn/ui |
+| **State Management** | TanStack React Query |
+| **Routing** | React Router DOM v6 |
+| **Backend** | Lovable Cloud (Supabase) |
+| **Database** | PostgreSQL with Row Level Security |
+| **Authentication** | Email-based authentication |
+| **Charts** | Recharts |
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 📁 Project Structure
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+src/
+├── components/
+│   ├── dashboard/        # Dashboard layout components
+│   ├── home/             # Landing page sections
+│   ├── layout/           # App layout (Navbar, Footer)
+│   └── ui/               # Reusable UI components (shadcn/ui)
+├── hooks/
+│   ├── useAuth.tsx       # Authentication hook
+│   └── use-mobile.tsx    # Mobile detection hook
+├── integrations/
+│   └── supabase/         # Database client & types
+├── pages/
+│   ├── dashboard/        # Dashboard pages
+│   │   ├── AddTask.tsx
+│   │   ├── AdminHome.tsx
+│   │   ├── AdminWithdrawals.tsx
+│   │   ├── BuyerHome.tsx
+│   │   ├── ManageTasks.tsx
+│   │   ├── ManageUsers.tsx
+│   │   ├── MySubmissions.tsx
+│   │   ├── MyTasks.tsx
+│   │   ├── Notifications.tsx
+│   │   ├── PaymentHistory.tsx
+│   │   ├── PurchaseCoins.tsx
+│   │   ├── TaskDetails.tsx
+│   │   ├── TaskList.tsx
+│   │   ├── Withdrawals.tsx
+│   │   └── WorkerHome.tsx
+│   ├── Dashboard.tsx
+│   ├── Index.tsx
+│   ├── Login.tsx
+│   ├── Register.tsx
+│   └── NotFound.tsx
+└── lib/
+    └── utils.ts          # Utility functions
 ```
 
-**Edit a file directly in GitHub**
+## 🗄️ Database Schema
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Tables
 
-**Use GitHub Codespaces**
+| Table | Description |
+|-------|-------------|
+| `profiles` | User profiles with coins balance |
+| `user_roles` | User role assignments (worker/buyer/admin) |
+| `tasks` | Task listings posted by buyers |
+| `submissions` | Worker task submissions |
+| `payments` | Coin purchase transactions |
+| `withdrawals` | Withdrawal requests |
+| `notifications` | User notifications |
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Security
+- **Row Level Security (RLS)** enabled on all tables
+- Role-based access control
+- Secure authentication flow
+- Protected API endpoints
 
-## What technologies are used for this project?
+## 🚀 Getting Started
 
-This project is built with:
+### Prerequisites
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- Node.js 18+ and npm
+- Git
 
-## How can I deploy this project?
+### Installation
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+1. **Clone the repository**
+   ```bash
+   git clone <YOUR_GIT_URL>
+   cd micro-gig-nexus
+   ```
 
-## Can I connect a custom domain to my Lovable project?
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-Yes, you can!
+3. **Start development server**
+   ```bash
+   npm run dev
+   ```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+4. **Open in browser**
+   ```
+   http://localhost:5173
+   ```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## 📱 Screenshots
+
+### Landing Page
+- Hero section with platform introduction
+- Features showcase
+- How it works guide
+- Best workers leaderboard
+- Testimonials
+- Call to action
+
+### Dashboard
+- Role-specific home pages
+- Task management interface
+- Submission tracking
+- Coin management
+- Withdrawal system
+
+## 🔐 User Roles
+
+| Role | Permissions |
+|------|-------------|
+| **Worker** | Browse tasks, submit work, withdraw earnings |
+| **Buyer** | Post tasks, review submissions, purchase coins |
+| **Admin** | Full platform access, user management, withdrawals |
+
+## 💰 Coin Economy
+
+- **1 Coin = $1 USD**
+- Buyers purchase coins to fund task rewards
+- Workers earn coins upon task approval
+- Minimum withdrawal: 10 coins
+- Maximum withdrawal: Available balance minus pending withdrawals
+
+## 🔄 Workflow
+
+```mermaid
+graph LR
+    A[Buyer Posts Task] --> B[Worker Views Task]
+    B --> C[Worker Submits Work]
+    C --> D[Buyer Reviews]
+    D -->|Approved| E[Worker Gets Paid]
+    D -->|Rejected| B
+    E --> F[Worker Withdraws]
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 🙏 Acknowledgments
+
+- Built with [Lovable](https://lovable.dev)
+- UI Components from [shadcn/ui](https://ui.shadcn.com)
+- Icons from [Lucide](https://lucide.dev)
+
+---
+
+<p align="center">
+  Made with ❤️ using <a href="https://lovable.dev">Lovable</a>
+</p>
